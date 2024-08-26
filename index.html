@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>飞腾导航 触手可得</title>
+<link rel="icon" href="导航logo.png" type="image/导航logo.png">
+ <style type="text/css">
+  body {
+    background-image: url('./网站背景.png');
+    background-size: 100% 100%;
+    background-attachment: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100vh;
+    margin: 0;
+  }
+  
+  form {
+    display: inline-block;
+    margin-top: 60px; /* 添加上边距来实现向下移动 */
+  }
+  
+  /* 其他样式保持不变 */
+  
+  form .text {
+    border: 2px solid #FFFFFF;
+    width: 260px;
+    height: 35px;
+    font-size: 14px;
+    outline: none;
+    vertical-align: middle;
+    background-color: rgba(255, 255, 255, 0.5);
+    opacity: 0.7;
+  }
+  
+  form .search {
+    background-color: transparent;
+    border: 1px solid #005e8d;
+    cursor: pointer;
+    margin-left: -2px;
+    vertical-align: middle;
+    transition: box-shadow 0.3s ease-in-out;
+  }
+  
+  form .search:active {
+    transform: scale(0.95);
+  }
+  
+  form .search:hover {
+    box-shadow: 0 0 10px #00a8f3;
+  }
+</style>
+</head>
+<body>
+  <form target="_blank" method="get" action="https://www.bing.com/search">
+    <input type="text" placeholder="点我搜索" name="q" class="text" />
+    <input type="image" src="搜索按钮.png" alt="搜索" class="search">
+  </form>
+</body>
+</html>
