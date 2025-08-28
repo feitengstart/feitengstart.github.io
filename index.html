@@ -1,0 +1,1992 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>飞腾导航 触手可得</title>
+<link rel="icon" href="导航logo.png" type="image/png">
+
+<!-- 引入 Chart.js 库 -->
+<script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/Chart.js/3.7.1/chart.js"></script>
+
+
+<style type="text/css">
+/* 设置全局字体为黑体 */
+body {
+font-family: '黑体', sans-serif;
+/* 优先使用黑体，如果没有则使用系统默认的无衬线字体 */
+}
+
+html,body{
+height:100%;
+margin:0;
+}
+body{
+background-image:url('./1网站背景.png');
+background-size:cover;
+background-attachment:fixed;
+display:flex;
+justify-content:center;
+align-items:flex-start;
+position:relative;
+}
+
+
+
+.close-btn {
+    position: absolute; /* 设置按钮为绝对定位 */
+    top: 10px;          /* 距离顶部10像素 */
+    right: 10px;        /* 距离右侧10像素 */
+    width: auto;        /* 宽度自动适应内容 */
+    height: auto;       /* 高度自动适应内容 */
+    background: none;   /* 无背景 */
+    border: none;       /* 无边框 */
+    border-radius: 0;   /* 无圆角 */
+    cursor: pointer;    /* 鼠标悬停时显示为指针，表示可点击 */
+    transition: transform .2s ease; /* 平滑过渡效果，用于缩放动画 */
+    display: flex;      /* 使用flex布局来居中对齐内容 */
+    align-items: center;/* 垂直居中对齐 */
+    justify-content: center;/* 水平居中对齐 */
+    color:#ff484f;       /* 文字颜色为黑色 */
+    font-size: 18px;    /* 文字大小为18像素 */
+    font-weight: bold;  /* 文字加粗 */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* 添加文字阴影 */
+}
+
+.close-btn:hover {
+    transform: scale(1.1); /* 鼠标悬停时，按钮放大10% */
+}
+        /* --------- 搜索表单 --------- */
+        .search-wrapper {
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .search-line {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .text {
+            width: 260px;
+            height: 38px;
+            padding: 0 8px;
+            font-size: 14px;
+            border: 2px solid #fff;
+            border-radius: 7px;
+            background: rgba(255, 255, 255, .5);
+            outline: none;
+        }
+
+    
+.search-btn {
+    width: 64px;
+    height: 40px;
+    background-color: #0099ff;
+    color: #fff;
+    border: 2px solid #2facff;
+    border-radius: 7px;
+    font-size: 16px; /* 设置合适的字号 */
+    line-height: 40px; /* 根据按钮高度调整行高，使文字垂直居中 */
+    text-align: center; /* 水平居中 */
+    cursor: pointer;
+    font-family: SimHei, "黑体", sans-serif; /* 设置字体为黑体 */
+    margin-left: -2px;
+    vertical-align: middle;
+    transition: box-shadow 0.3s ease-in-out;
+    padding: 0; /* 去掉默认内边距，避免尺寸被撑开 */
+    position: relative; /* 为伪元素定位 */
+    display: flex; /* 使用flex布局 */
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+}
+
+.search-btn::before {
+    content: "搜索"; /* 添加文字 */
+    font-size: 16px; /* 设置文字大小 */
+    color: #fff; /* 设置文字颜色 */
+    font-family: SimHei, "黑体", sans-serif; /* 设置字体为黑体 */
+}
+
+.search-btn:hover {
+    box-shadow: 0 0 15px #00a8f3; /* 鼠标悬停时的光效 */
+}
+
+.search-btn:active {
+    transform: scale(0.95); /* 按下时缩小 */
+}
+        /* ---------- 列表容器 ---------- */
+        .list-container {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            width: 480px;
+            max-height: 580px; /* 足够容纳历史记录和搜索建议 */
+            backdrop-filter: blur(10px); /* 高斯模糊效果 */
+            background: rgba(255, 156, 88, 0.25); /* 半透明背景 */
+            margin-top: 20px;
+            display: none;
+            opacity: 0;
+            transition: opacity .3s ease;
+        }
+
+        .list-container.visible {
+            display: block;
+            opacity: 1;
+        }
+
+        .list-title {
+            margin: 7px 0 8px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 4px #000;
+            padding: 0 18px;
+        }
+
+   .list-title.visible {
+            opacity: 1;
+        }
+
+        .list-wrapper {
+            position: relative;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .list-wrapper li {
+            padding: 12px 18px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #fff;
+            text-shadow: 0 0 3px #000;
+        }
+
+        .list-wrapper li:hover {
+            background: rgba(255, 255, 255, .20);
+        }
+
+  /* ---------- 自定义滚动条 ---------- */
+        .list-wrapper::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        .list-wrapper::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .list-wrapper::-webkit-scrollbar-thumb {
+            background: url('1滑动条2.png') center/cover no-repeat;
+            border-radius: 10px;
+        }
+
+        .list-wrapper::-webkit-scrollbar-thumb:hover {
+            background: url('1滑动条.png') center/cover no-repeat;
+        }
+
+
+        /* ---------- 动画 ---------- */
+        .search-wrapper.animate {
+            animation: pop .35s forwards;
+        }
+
+        @keyframes pop {
+            0% {
+                transform: scale(.92) translateY(-50px);
+                opacity: .5;
+            }
+            100% {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+body {
+background-image: url('./1网站背景.png');
+background-size: cover;
+/* 等比例放大背景 */
+background-attachment: fixed;
+display: flex;
+justify-content: center;
+align-items: flex-start;
+height: 100vh;
+margin: 0;
+position: relative;
+/* 确保子元素可以使用绝对定位 */
+}
+
+.center-image {
+position: absolute;
+top: 514.5px;
+left: 800px;
+transform: translate(-50%, -50%);
+width: 1400px;
+height: 330px;
+backdrop-filter: blur(10px); /* 毛玻璃效果 */
+border: 2px solid rgba(255, 255, 255, 0.5); /* 半透明白色边框 */
+border-radius: 30px;
+box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* 阴影效果 */
+z-index: -1000;
+}
+form {
+display: inline-block;
+margin-top: 60px;
+/* 添加上边距来实现向下移动 */
+}
+
+form .text {
+border: 2px solid #FFFFFF;
+width: 260px;
+height: 35px;
+font-size: 14px;
+outline: none;
+vertical-align: middle;
+background-color: rgba(255, 255, 255, 0.5);
+opacity: 0.7;
+border-radius: 7px;
+/* 添加圆角 */
+}
+
+
+
+/* 天气按钮样式 */
+#weather-button {
+transition: opacity 1s ease;
+/* 添加透明度渐变动画 */
+}
+
+.weather-button {
+position: absolute;
+top: 3px;
+right: 100px;
+border: none;
+background-size: cover;
+cursor: pointer;
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+background-color: transparent;
+z-index: 10;
+}
+
+.weather-button:hover {
+box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.weather-button:active {
+transform: scale(0.95);
+}
+
+#weatherchuangkou::-webkit-scrollbar {
+width: 12px;
+/* 滚动条宽度 */
+}
+
+#weatherchuangkou::-webkit-scrollbar-track {
+background: url('scrollbar-track.png') repeat-y;
+/* 滚动条轨道背景图片 */
+border-radius: 6px;
+/* 滚动条轨道圆角 */
+opacity: 0.5;
+/* 轨道半透明 */
+}
+
+#weatherchuangkou::-webkit-scrollbar-thumb {
+background: url('1滑动条.png') repeat-y;
+/* 滚动条拇指背景图片 */
+border-radius: 4px;
+/* 滚动条拇指圆角 */
+opacity: 0.5;
+/* 拇指半透明 */
+height: 20px;
+/* 滚动条拇指高度 */
+}
+
+#weatherchuangkou:hover::-webkit-scrollbar-track {
+opacity: 1;
+/* 滚动条轨道悬停时不透明 */
+}
+
+#weatherchuangkou:hover::-webkit-scrollbar-thumb {
+opacity: 1;
+/* 滚动条拇指悬停时不透明 */
+}
+
+.weather-popup {
+display: none;
+position: absolute;
+top: 50px;
+right: 35px;
+width: 200px;
+/* 调整宽度以适应图表 */
+max-height: 300px;
+/* 调整最大高度以适应图表 */
+background: rgba(255, 255, 255, 0.2);
+border: 1px solid #ccc;
+border-radius: 15px;
+color: #ffffff;
+background-color: rgba(255, 255, 255, 0.0); /* 半透明白色背景 */
+backdrop-filter: blur(10px); /* 高斯模糊效果 */
+border: 2px solid rgba(255, 255, 255, 0.4); /* 半透明白色边框 */
+border-radius: 10px;
+box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* 阴影效果 */
+padding: 15px;
+transition: opacity 0.5s ease-in-out;
+opacity: 0;
+z-index: 1000;
+padding: 10px;
+box-sizing: border-box;
+overflow: hidden;
+}
+
+.weather-popup.show {
+display: block;
+opacity: 1;
+}
+
+.weather-popup video {
+width: 100%;
+height: auto;
+margin-bottom: 10px;
+}
+
+.scroll-container {
+position: relative;
+height: 100%;
+}
+
+.scroll-content {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+transition: top 0.5s ease;
+}
+
+.scroll-bar {
+position: absolute;
+top: 0;
+right: 0;
+width: 10px;
+height: 100%;
+background: url('1滑动条.png');
+background-size: 100% 100%;
+}
+
+.scroll-handle {
+position: absolute;
+top: 0;
+right: 0;
+width: 10px;
+height: 20px;
+background: url('滑动条.png');
+background-size: 100% 100%;
+cursor: pointer;
+transition: top 0.5s ease;
+}
+
+#temperature-chart {
+border: 1px solid #ffffff;
+width: 100%!important;
+height: 200px!important;
+}
+
+.update-log-button {
+position: absolute;
+top: 4px;
+right: 300px;
+/* 调整位置 */
+width: 43px;
+height: 29px;
+background-image: url('1日志.png');
+background-size: cover;
+background-position: center;
+border-radius: 3px;
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+cursor: pointer;
+border: none;
+}
+
+.update-log-button:hover {
+box-shadow: 0 0 15px #ffab00;
+}
+
+.update-log-button:active {
+transform: translate(-50%, -50%) scale(0.95);
+}
+
+.popup {
+display: none;
+position: fixed;
+top: 200px;
+right: 100px;
+transform: translate(-50%, -50%);
+width: 160px;
+height: 300px;
+background-color: rgba(255, 255, 255, 0.0); /* 半透明白色背景 */
+backdrop-filter: blur(10px); /* 高斯模糊效果 */
+border: 2px solid rgba(255, 255, 255, 0.4); /* 半透明白色边框 */
+border-radius: 10px;
+box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* 阴影效果 */
+padding: 15px;
+z-index: 1000;
+transition: opacity 0.5s ease;
+}
+
+.popup-content {
+background-color: rgba(255, 255, 255, 0.0); /* 弹窗内容背景色 */
+border-radius: 10px;
+padding: 15px;
+z-index: 1001;
+}
+
+
+.popup-content h3 {
+margin-top: 0;
+text-align: center; /* 居中标题 */
+color: #0074a8; /* 标题颜色为蓝色 */
+font-size: 19px; /* 设置弹窗内容的字体大小为14px */
+}
+
+.popup-content ul {
+list-style-type: none;
+padding: 0;
+}
+
+.popup-content li {
+margin: 5px 0;
+}
+
+.popup-content li span.date {
+color: #383838; /* 时间颜色为蓝色 */
+font-size: 16px; /* 设置弹窗内容的字体大小为14px */
+}
+
+.popup-content li span.content {
+color: #FFFFFF; /* 更新内容颜色为白色 */
+font-size: 14px; /* 设置弹窗内容的字体大小为14px */
+}
+
+ /* 设置图片按钮的样式 */
+        .feiteng-button {
+            position: absolute;
+            /* 使用绝对定位 */
+            top: 16px;
+            /* 与毛玻璃图片相同的位置 */
+            left: 58px;
+            /* 与毛玻璃图片相同的位置 */
+            transform: translate(-50%, -50%);
+            /* 居中对齐 */
+            width: 48px;
+            /* 正方形的宽度 */
+            height: 32px;
+            /* 正方形的高度 */
+            background-image: url('logo按钮.png');
+            /* 使用本地图片作为背景 */
+            background-size: cover;
+            /* 覆盖整个按钮 */
+            background-position: center;
+            /* 将图片置于按钮中心 */
+            border-radius: 3px;
+            /* 圆角 */
+            transition: box-shadow 0.3s ease, transform 0.1s ease;
+            cursor: pointer;
+            border: none;
+            /* 移除边框 */
+        }
+
+        /* 设置鼠标悬停时的样式 */
+        .feiteng-button:hover {
+            box-shadow: 0 0 15px #ff7f27;
+            /* 鼠标悬停时的光效 */
+        }
+
+        /* 设置按下时的动画效果 */
+        .feiteng-button:active {
+            transform: translate(-50%, -50%) scale(0.95);
+            /* 按下时缩小 */
+        }
+
+/* 设置图片按钮的样式 */
+.bilibili-button {
+position: absolute;
+/* 使用绝对定位 */
+top: 493px;
+/* 与毛玻璃图片相同的位置 */
+left: 200px;
+/* 与毛玻璃图片相同的位置 */
+transform: translate(-50%, -50%);
+/* 居中对齐 */
+width: 100px;
+/* 正方形的宽度 */
+height: 100px;
+/* 正方形的高度 */
+background-image: url('1bilibili.png');
+/* 使用本地图片作为背景 */
+background-size: cover;
+/* 覆盖整个按钮 */
+background-position: center;
+/* 将图片置于按钮中心 */
+border-radius: 10px;
+/* 圆角 */
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+cursor: pointer;
+border: none;
+/* 移除边框 */
+}
+
+/* 设置鼠标悬停时的样式 */
+.bilibili-button:hover {
+box-shadow: 0 0 15px #fc6969;
+/* 鼠标悬停时的光效 */
+}
+
+/* 设置按下时的动画效果 */
+.bilibili-button:active {
+transform: translate(-50%, -50%) scale(0.95);
+/* 按下时缩小 */
+}
+
+/* 设置微博按钮的样式 */
+.weibo-button {
+position: absolute;
+top: 493px;
+left: 310px;
+/* 调整位置 */
+transform: translate(-50%, -50%);
+width: 100px;
+height: 100px;
+background-image: url('1微博.png');
+background-size: cover;
+background-position: center;
+border-radius: 10px;
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+cursor: pointer;
+border: none;
+}
+
+.weibo-button:hover {
+box-shadow: 0 0 15px #ffab00;
+}
+
+.weibo-button:active {
+transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* 设置qq按钮的样式 */
+.qq-button {
+position: absolute;
+top: 493px;
+left: 420px;
+/* 调整位置 */
+transform: translate(-50%, -50%);
+width: 100px;
+height: 100px;
+background-image: url('1qq.png');
+background-size: cover;
+background-position: center;
+border-radius: 10px;
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+cursor: pointer;
+border: none;
+}
+
+.qq-button:hover {
+box-shadow: 0 0 15px #ffffff;
+}
+
+.qq-button:active {
+transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* 设置hmcl按钮的样式 */
+.hmcl-button {
+position: absolute;
+top: 493px;
+left: 530px;
+/* 调整位置 */
+transform: translate(-50%, -50%);
+width: 100px;
+height: 100px;
+background-image: url('1hmcl.png');
+background-size: cover;
+background-position: center;
+border-radius: 10px;
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+cursor: pointer;
+border: none;
+}
+
+.hmcl-button:hover {
+box-shadow: 0 0 15px #845632;
+}
+
+.hmcl-button:active {
+transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* 设置微软按钮的样式 */
+.weiruan-button {
+position: absolute;
+top: 493px;
+left: 640px;
+/* 调整位置 */
+transform: translate(-50%, -50%);
+width: 100px;
+height: 100px;
+background-image: url('1微软.png');
+background-size: cover;
+background-position: center;
+border-radius: 10px;
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+cursor: pointer;
+border: none;
+}
+
+
+.weiruan-button:hover {
+box-shadow: 0 0 15px #00a6f0;
+}
+
+.weiruan-button:active {
+transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* 设置wps按钮的样式 */
+.wps-button {
+position: absolute;
+top: 493px;
+left: 750px;
+/* 调整位置 */
+transform: translate(-50%, -50%);
+width: 100px;
+height: 100px;
+background-image: url('1wps.png');
+background-size: cover;
+background-position: center;
+border-radius: 10px;
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+cursor: pointer;
+border: none;
+}
+
+
+.wps-button:hover {
+box-shadow: 0 0 15px #f44f1c;
+}
+
+.wps-button:active {
+transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* 设置火绒按钮的样式 */
+.huorong-button {
+position: absolute;
+top: 603px;
+left: 420px;
+/* 调整位置 */
+transform: translate(-50%, -50%);
+width: 100px;
+height: 100px;
+background-image: url('1火绒.png');
+background-size: cover;
+background-position: center;
+border-radius: 10px;
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+cursor: pointer;
+border: none;
+}
+
+
+.huorong-button:hover {
+box-shadow: 0 0 15px #f4bf1d;
+}
+
+.huorong-button:active {
+transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* 设置微信按钮的样式 */
+.weixin-button {
+position: absolute;
+top: 493px;
+left: 860px;
+/* 调整位置 */
+transform: translate(-50%, -50%);
+width: 100px;
+height: 100px;
+background-image: url('1微信.png');
+background-size: cover;
+background-position: center;
+border-radius: 10px;
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+cursor: pointer;
+border: none;
+}
+
+
+.weixin-button:hover {
+box-shadow: 0 0 15px #30fe00;
+}
+
+.weixin-button:active {
+transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* 设置剪映按钮的样式 */
+.jianying-button {
+position: absolute;
+top: 493px;
+left: 970px;
+/* 调整位置 */
+transform: translate(-50%, -50%);
+width: 100px;
+height: 100px;
+background-image: url('1剪映.png');
+background-size: cover;
+background-position: center;
+border-radius: 10px;
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+cursor: pointer;
+border: none;
+}
+
+
+.jianying-button:hover {
+box-shadow: 0 0 15px #000000;
+}
+
+.jianying-button:active {
+transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* 设置网易按钮的样式 */
+.wangyi-button {
+position: absolute;
+top: 493px;
+left: 1080px;
+/* 调整位置 */
+transform: translate(-50%, -50%);
+width: 100px;
+height: 100px;
+background-image: url('1网易云.png');
+background-size: cover;
+background-position: center;
+border-radius: 10px;
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+cursor: pointer;
+border: none;
+}
+
+
+.wangyi-button:hover {
+box-shadow: 0 0 15px #f30000;
+}
+
+.wangyi-button:active {
+transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* 设置dev按钮的样式 */
+.dev-button {
+position: absolute;
+top: 493px;
+left: 1190px;
+/* 调整位置 */
+transform: translate(-50%, -50%);
+width: 100px;
+height: 100px;
+background-image: url('1dev.png');
+background-size: cover;
+background-position: center;
+border-radius: 10px;
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+cursor: pointer;
+border: none;
+}
+
+
+.dev-button:hover {
+box-shadow: 0 0 15px #001eff;
+}
+
+.dev-button:active {
+transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* 设置淘宝按钮的样式 */
+.taobao-button {
+position: absolute;
+top: 493px;
+left: 1300px;
+/* 调整位置 */
+transform: translate(-50%, -50%);
+width: 100px;
+height: 100px;
+background-image: url('1淘宝.png');
+background-size: cover;
+background-position: center;
+border-radius: 10px;
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+cursor: pointer;
+border: none;
+}
+
+
+.taobao-button:hover {
+box-shadow: 0 0 15px #fa5705;
+}
+
+.taobao-button:active {
+transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* 设置edge按钮的样式 */
+.edge-button {
+position: absolute;
+top: 493px;
+left: 1410px;
+/* 调整位置 */
+transform: translate(-50%, -50%);
+width: 100px;
+height: 100px;
+background-image: url('1edge.png');
+background-size: cover;
+background-position: center;
+border-radius: 10px;
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+cursor: pointer;
+border: none;
+}
+
+
+.edge-button:hover {
+box-shadow: 0 0 15px #0a81d2;
+}
+
+.edge-button:active {
+transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* 设置vm按钮的样式 */
+.vm-button {
+position: absolute;
+top: 603px;
+left: 200px;
+/* 调整位置 */
+transform: translate(-50%, -50%);
+width: 100px;
+height: 100px;
+background-image: url('1vm.png');
+background-size: cover;
+background-position: center;
+border-radius: 10px;
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+cursor: pointer;
+border: none;
+}
+
+
+.vm-button:hover {
+box-shadow: 0 0 15px #203a61;
+}
+
+.vm-button:active {
+transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* 设置蓝奏云按钮的样式 */
+.lz-button {
+position: absolute;
+top: 603px;
+left: 310px;
+/* 调整位置 */
+transform: translate(-50%, -50%);
+width: 100px;
+height: 100px;
+background-image: url('1蓝奏云.png');
+background-size: cover;
+background-position: center;
+border-radius: 10px;
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+cursor: pointer;
+border: none;
+}
+
+
+.lz-button:hover {
+box-shadow: 0 0 15px #f3a8ac;
+}
+
+.lz-button:active {
+transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* 设置vlc按钮的样式 */
+.vlc-button {
+position: absolute;
+top: 603px;
+left: 530px;
+/* 调整位置 */
+transform: translate(-50%, -50%);
+width: 100px;
+height: 100px;
+background-image: url('1vlc.png');
+background-size: cover;
+background-position: center;
+border-radius: 10px;
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+cursor: pointer;
+border: none;
+}
+
+
+.vlc-button:hover {
+box-shadow: 0 0 15px #f17500;
+}
+
+.vlc-button:active {
+transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* 设置winrar按钮的样式 */
+.winrar-button {
+position: absolute;
+top: 603px;
+left: 640px;
+/* 调整位置 */
+transform: translate(-50%, -50%);
+width: 100px;
+height: 100px;
+background-image: url('1winrar.png');
+background-size: cover;
+background-position: center;
+border-radius: 10px;
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+cursor: pointer;
+border: none;
+}
+
+
+.winrar-button:hover {
+box-shadow: 0 0 15px #9ACD32;
+
+}
+
+.winrar-button:active {
+transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* 设置有道按钮的样式 */
+.youdao-button {
+position: absolute;
+top: 603px;
+left: 750px;
+/* 调整位置 */
+transform: translate(-50%, -50%);
+width: 100px;
+height: 100px;
+background-image: url('1有道.png');
+background-size: cover;
+background-position: center;
+border-radius: 10px;
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+cursor: pointer;
+border: none;
+}
+
+
+.youdao-button:hover {
+box-shadow: 0 0 15px #fe1a27;
+
+}
+
+.youdao-button:active {
+transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* 设置智慧按钮的样式 */
+.zhihui-button {
+position: absolute;
+top: 603px;
+left: 860px;
+/* 调整位置 */
+transform: translate(-50%, -50%);
+width: 100px;
+height: 100px;
+background-image: url('1智慧中小学.png');
+background-size: cover;
+background-position: center;
+border-radius: 10px;
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+cursor: pointer;
+border: none;
+}
+
+
+.zhihui-button:hover {
+box-shadow: 0 0 15px #3b76ee;
+
+}
+
+.zhihui-button:active {
+transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* 设置kimi按钮的样式 */
+.kimi-button {
+position: absolute;
+top: 603px;
+left: 970px;
+/* 调整位置 */
+transform: translate(-50%, -50%);
+width: 100px;
+height: 100px;
+background-image: url('1kimi.png');
+background-size: cover;
+background-position: center;
+border-radius: 10px;
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+cursor: pointer;
+border: none;
+}
+
+
+.kimi-button:hover {
+box-shadow: 0 0 15px #262626;
+
+}
+
+.kimi-button:active {
+transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* 设置腾讯按钮的样式 */
+.tx-button {
+position: absolute;
+top: 603px;
+left: 1080px;
+/* 调整位置 */
+transform: translate(-50%, -50%);
+width: 100px;
+height: 100px;
+background-image: url('1腾讯.png');
+background-size: cover;
+background-position: center;
+border-radius: 10px;
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+cursor: pointer;
+border: none;
+}
+
+
+.tx-button:hover {
+box-shadow: 0 0 15px #749e32;
+
+}
+
+.tx-button:active {
+transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* 设置希沃按钮的样式 */
+.xw-button {
+position: absolute;
+top: 603px;
+left: 1190px;
+/* 调整位置 */
+transform: translate(-50%, -50%);
+width: 100px;
+height: 100px;
+background-image: url('1希沃.png');
+background-size: cover;
+background-position: center;
+border-radius: 10px;
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+cursor: pointer;
+border: none;
+}
+
+
+.xw-button:hover {
+box-shadow: 0 0 15px #cae0a9;
+
+}
+
+.xw-button:active {
+transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* 设置qq输入法按钮的样式 */
+.qqs-button {
+position: absolute;
+top: 603px;
+left: 1300px;
+/* 调整位置 */
+transform: translate(-50%, -50%);
+width: 100px;
+height: 100px;
+background-image: url('1qq输入法.png');
+background-size: cover;
+background-position: center;
+border-radius: 10px;
+transition: box-shadow 0.3s ease, transform 0.1s ease;
+cursor: pointer;
+border: none;
+}
+
+
+.qqs-button:hover {
+box-shadow: 0 0 15px #96e2fe;
+
+}
+
+.qqs-button:active {
+transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* 添加文本的样式 */
+#targetText {
+position: fixed;
+top: 302px;
+/* 距离顶部300px */
+left: 150px;
+/* 距离左边150px */
+color: black;
+/* 文本颜色为黑色 */
+font-family: '黑体', 'SimHei', sans-serif;
+/* 设置字体为黑体 */
+font-size: 63px;
+/* 设置字体大小为24px */
+
+}
+
+/* 温度折线图容器样式 */
+#temperature-chart-container {
+margin-top: 20px;
+}
+</style>
+</head>
+<template>
+<router-view v-slot="{ Component }">
+<transition name="slide-left">
+<component :is="Component" />
+</transition>
+</router-view>
+</template>
+
+<body>
+<div class="center-image"></div>
+<a href="https://feitengstart.github.io/index.html"
+style="position: absolute;
+top: 2px;
+left: 1000px;
+color: #18aaff;">切换到扁平化</a>
+</form>
+<button id="updateLogButton" class="update-log-button"></button>
+<button id="weatherButton" class="weather-button"></button>
+<a href="https://www.bilibili.com" class="bilibili-button"></a>
+<a href="https://www.weibo.com" class="weibo-button"></a>
+<a href="https://im.qq.com/index/" class="qq-button"></a>
+<a href="https://hmcl.huangyuhui.net/ " class="hmcl-button"></a>
+<a href="https://www.microsoft.com/" class="weiruan-button"></a>
+<a href="https://www.wps.cn/" class="wps-button"></a>
+<a href="https://www.huorong.cn/" class="huorong-button"></a>
+<a href="https://weixin.qq.com/" class="weixin-button"></a>
+<a href="https://www.capcut.cn/" class="jianying-button"></a>
+<a href="https://music.163.com/" class="wangyi-button"></a>
+<a href="https://sourceforge.net/projects/orwelldevcpp/" class="dev-button"></a>
+<a href="https://www.taobao.com/" class="taobao-button"></a>
+<a href="https://www.microsoft.com/zh-cn/edge/download?form=MA13FJ" class="edge-button"></a>
+<a href="https://www.oracle.com/cn/virtualization/technologies/vm/downloads/virtualbox-downloads.html "class="vm-button"></a>
+<a href="https://www.lanzou.com/" class="lz-button"></a>
+<a href="https://www.videolan.org " class="vlc-button"></a>
+<a href="https://www.win-rar.com/download.html?L=7 " class="winrar-button"></a>
+<a href="https://fanyi.youdao.com/" class="youdao-button"></a>
+<a href="https://basic.smartedu.cn/" class="zhihui-button"></a>
+<a href="https://kimi.moonshot.cn/" class="kimi-button"></a>
+<a href="https://v.qq.com/" class="tx-button"></a>
+<a href="https://easinote.seewo.com/" class="xw-button"></a>
+<a href="https://qq.pinyin.cn/" class="qqs-button"></a>
+<!-- 添加黑色黑体文本 -->
+<p id="targetText">网站</p>
+<div class="weather-container">
+<div class="weather-info">
+<div class="current-weather">
+<p class="current-temperature"></p>
+<p class="weather-condition"></p>
+</div>
+<div class="forecast-weather">
+<div id="forecast-details"></div>
+</div>
+</div>
+<div class="slider">
+<div class="slider-handle"></div>
+</div>
+<button id="weatherButton" class="weather-button"></button>
+<div id="weatherchuangkou" class="weather-popup">
+<video autoplay muted loop></video>
+<div id="weather-details"></div>
+<!-- 添加温度折线图容器 -->
+<div id="temperature-chart-container">
+<canvas id="temperature-chart"></canvas>
+</div>
+</div>
+</div>
+<div id="updateLogPopup" class="popup">
+<div class="popup-content">
+<h3>更新日志</h3>
+<ul>
+<li><span class="date">版本:beta2 更新时间:2025.5.5</span><span class="content">标题栏大更新，带来了天气预报、更新日志、扁平化选项的功能.</span></li>
+<li><span class="date">版本:beta1.5 更新时间:2025.1.12</span><span class="content">带来了常用网站功能.</span></li>
+<li><span class="date">版本:beta1 更新时间:2024.8.26</span><span class="content">开天辟地，实现了搜索栏功能.</span></li>
+</ul>
+</div>
+</div>
+<div class="center-image"></div>
+
+<div class="search-wrapper">
+<form class="search-line" id="searchForm">
+<input class="text" id="query" type="text" autocomplete="off" placeholder="输入关键词搜索…">
+<button type="submit" class="search-btn"></button>
+</form>
+
+<div class="list-container">
+<div class="list-title">历史搜索</div>
+<button class="close-btn" onclick="closeOverlay()">X</button>
+<div class="list-wrapper"><ul id="history"></ul></div>
+
+<div class="list-title">搜索推荐</div>
+<div class="list-wrapper"><ul id="suggest"></ul></div>
+</div>
+</div>
+
+
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+            const updateLogButton = document.getElementById('updateLogButton');
+            const updateLogPopup = document.getElementById('updateLogPopup');
+
+            // 动画效果：鼠标悬停时显示弹窗
+            updateLogButton.addEventListener('mouseover', function () {
+                updateLogButton.style.transform = 'scale(1.1)';
+                updateLogPopup.style.display = 'block';
+                updateLogPopup.style.opacity = 0;
+                setTimeout(() => {
+                    updateLogPopup.style.opacity = 1;
+                }, 10);
+            });
+
+            updateLogButton.addEventListener('mouseout', function () {
+                updateLogButton.style.transform = '';
+                // 不直接隐藏弹窗，等待鼠标移出弹窗
+            });
+
+            updateLogPopup.addEventListener('mouseover', function () {
+                updateLogPopup.style.opacity = 1;
+                // 清除可能存在的隐藏定时器
+                clearTimeout(updateLogPopup.hideTimeout);
+            });
+
+            updateLogPopup.addEventListener('mouseout', function () {
+                // 设置一个延迟隐藏的定时器
+                updateLogPopup.hideTimeout = setTimeout(() => {
+                    updateLogPopup.style.opacity = 0;
+                    setTimeout(() => {
+                        updateLogPopup.style.display = 'none';
+                    }, 500);
+                }, 500);
+            });
+        });
+    </script>
+<script>
+const form = document.getElementById('searchForm');
+        const input = document.getElementById('query');
+        const histUl = document.getElementById('history');
+        const sugUl = document.getElementById('suggest');
+        const STORAGE_KEY = 'bingHistory';
+
+        function doSearch(q) {
+            if (!q.trim()) return;
+            saveHistory(q.trim());
+
+            /* 整页向左滑动后跳转 */
+            document.documentElement.style.transition = 'transform .45s ease';
+            document.documentElement.style.transform = 'translateX(-100%)';
+            setTimeout(() => {
+                location.href = `https://cn.bing.com/search?q=${encodeURIComponent(q)}`;
+            }, 450);
+        }
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            doSearch(input.value);
+        });
+
+        function saveHistory(t) {
+            const arr = [t, ...JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]').filter(v => v !== t)];
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(arr.slice(0, 15)));
+        }
+
+        function renderHistory() {
+            const arr = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            histUl.innerHTML = '';
+            arr.forEach(t => {
+                const li = document.createElement('li');
+                li.textContent = t;
+                li.onclick = () => {
+                    input.value = t;
+                    doSearch(t);
+                };
+                histUl.appendChild(li);
+            });
+        }
+
+        let timer;
+        input.addEventListener('input', () => {
+            clearTimeout(timer);
+            const q = input.value.trim();
+            if (!q) {
+                sugUl.innerHTML = '';
+                return;
+            }
+            timer = setTimeout(() => {
+                const cb = 's' + Date.now();
+                window[cb] = d => {
+                    renderSuggest((d?.AS?.Results?.[0]?.Suggests || []).map(i => i.Txt));
+                    delete window[cb];
+                };
+                const s = document.createElement('script');
+                s.src = `https://api.bing.com/qsonhs.aspx?type=cb&q=${encodeURIComponent(q)}&cb=${cb}`;
+                document.head.appendChild(s);
+                s.remove();
+            }, 200);
+        });
+
+        function renderSuggest(arr) {
+            sugUl.innerHTML = '';
+            arr.forEach(t => {
+                const li = document.createElement('li');
+                li.textContent = t;
+                li.onclick = () => {
+                    input.value = t;
+                    doSearch(t);
+                };
+                sugUl.appendChild(li);
+            });
+        }
+ // 显示搜索历史和搜索推荐
+        // 显示毛玻璃效果和搜索历史、搜索推荐
+        input.addEventListener('focus', () => {
+            document.querySelector('.center-image').classList.add('visible');
+            document.querySelector('.list-container').classList.add('visible');
+        });
+        function showOverlay() {
+            document.querySelector('.list-container').style.opacity = 0;
+            document.querySelectorAll('.list-title').forEach(title => {
+                title.style.opacity = 0;
+            });
+            setTimeout(() => {
+                document.querySelector('.list-container').classList.add('visible');
+                document.querySelector('.list-container').style.opacity = 1;
+                document.querySelectorAll('.list-title').forEach(title => {
+                    title.classList.add('visible');
+                    title.style.opacity = 1;
+                });
+            }, 10); // 确保先设置透明度为0，再设置为1
+        }
+
+// 隐藏搜索历史和搜索推荐
+function hideOverlay() {
+    document.querySelector('.list-container').style.opacity = 0; // 设置透明度为0
+    document.querySelectorAll('.list-title').forEach(title => {
+        title.style.opacity = 0; // 设置标题透明度为0
+    });
+
+    // 等待动画完成后再移除visible类
+    setTimeout(() => {
+        document.querySelector('.list-container').classList.remove('visible');
+        document.querySelectorAll('.list-title').forEach(title => {
+            title.classList.remove('visible');
+        });
+    }, 300); // 等待300ms动画完成
+}
+
+// 点击搜索框时显示
+input.addEventListener('focus', () => {
+    showOverlay();
+});
+
+// 点击关闭按钮时隐藏
+document.querySelector('.close-btn').addEventListener('click', () => {
+    hideOverlay();
+});
+        renderHistory();
+
+</script>
+
+    <script>
+const API_KEY = 'SDCGEHOJ252ALyp9a';
+const weatherButton = document.getElementById('weatherButton');
+const weatherPopup = document.getElementById('weatherchuangkou');
+const temperatureChartCanvas = document.getElementById('temperature-chart');
+let temperatureChart;
+
+async function fetchWeather(latitude, longitude) {
+    const currentWeatherUrl = `https://api.seniverse.com/v3/weather/now.json?key=${API_KEY}&location=${latitude}:${longitude}&language=zh-Hans&unit=c`;
+    const dailyWeatherUrl = `https://api.seniverse.com/v3/weather/daily.json?key=${API_KEY}&location=${latitude}:${longitude}&language=zh-Hans&unit=c&start=0&days=3`;
+
+    try {
+        const [currentWeatherResponse, dailyWeatherResponse] = await Promise.all([
+            fetch(currentWeatherUrl),
+            fetch(dailyWeatherUrl)
+        ]);
+
+        if (!currentWeatherResponse.ok || !dailyWeatherResponse.ok) {
+            throw new Error('网络响应不正常');
+        }
+
+        const currentWeatherData = await currentWeatherResponse.json();
+        const dailyWeatherData = await dailyWeatherResponse.json();
+
+        const currentTemp = currentWeatherData.results[0].now.temperature;
+        const currentCondition = currentWeatherData.results[0].now.text;
+        const dailyForecasts = dailyWeatherData.results[0].daily;
+        let lastUpdateTime = currentWeatherData.results[0].last_update;
+        // 处理时间字符串，去除 T 和时区信息
+        lastUpdateTime = lastUpdateTime.split('T').join(' ').substring(0, 16);
+
+        let imageUrl;
+        let buttonStyles;
+
+        // 根据天气状况设置图标和按钮样式
+        switch (currentCondition) {
+            case '晴':
+                imageUrl = '1晴天.png';
+                buttonStyles = {
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '40px',
+                    hoverColor: '#38aeff',
+                    hoverBorderGlow: '0 0 5px 3px #ffbf48'
+                };
+                break;
+            case '多云':
+                imageUrl = '1多云.png';
+                buttonStyles = {
+                    width: '84px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: '#0883d8',
+                    hoverBorderGlow: '0 0 5px 3px #ffb05b'
+                };
+                break;
+            case '大部多云':
+                imageUrl = '1多云.png';
+                buttonStyles = {
+                    width: '84px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: '#008ae9',
+                    hoverBorderGlow: '0 0 5px 3px #ffa647'
+                };
+                break;
+            case '晴间多云':
+                imageUrl = '1多云.png';
+                buttonStyles = {
+                    width: '84px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: '#0883d8',
+                    hoverBorderGlow: '0 0 5px 3px #ffd95b'
+                };
+                break;
+            case '阴':
+                imageUrl = '1阴天.png';
+                buttonStyles = {
+                    width: '84px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: '#c3c3c3',
+                    hoverBorderGlow: '0 0 5px 3px #d9d9d9'
+                };
+                break;
+            case '小雨':
+                imageUrl = '1小雨.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: '#828282',
+                    hoverBorderGlow: '0 0 5px 5px #979797'
+                };
+                break;
+            case '中雨':
+                imageUrl = '1中雨.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: '#6c6c6c',
+                    hoverBorderGlow: '0 0 5px 5px #828282'
+                };
+                break;
+            case '大雨':
+                imageUrl = '1大雨.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: '#585858',
+                    hoverBorderGlow: '0 0 5px 5px #676767'
+                };
+                break;
+            case '暴雨':
+                imageUrl = '1暴雨.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: '#4b4b4b',
+                    hoverBorderGlow: '0 0 5px 5px #5d5d5d'
+                };
+                break;
+            case '大暴雨':
+                imageUrl = '1大暴雨.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: '#404040',
+                    hoverBorderGlow: '0 0 5px 5px #494949'
+                };
+                break;
+            case '特大暴雨':
+                imageUrl = '1特大暴雨.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: '#302f2f',
+                    hoverBorderGlow: '0 0 5px 5px #414141'
+                };
+                break;
+            case '冻雨':
+                imageUrl = '1冻雨.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: '#6e6e6e',
+                    hoverBorderGlow: '0 0 5px 5px #7b7b7b'
+                };
+                break;
+            case '小雪':
+                imageUrl = '1小雪.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: 'white',
+                    hoverBorderGlow: '0 0 5px 5px white'
+                };
+                break;
+                case '雨夹雪':
+                imageUrl = '1雨夹雪.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: 'white',
+                    hoverBorderGlow: '0 0 5px 5px white'
+                };
+                break;
+                case '雷阵雨':
+                imageUrl = '1雷阵雨.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: 'white',
+                    hoverBorderGlow: '0 0 5px 5px white'
+                };
+                break;
+                case '雷阵雨伴有冰雹':
+                imageUrl = '1雷阵雨伴有冰雹.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: 'white',
+                    hoverBorderGlow: '0 0 5px 5px white'
+                };
+                break;
+                case '阵雪':
+                imageUrl = '1阵雪.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: 'white',
+                    hoverBorderGlow: '0 0 5px 5px white'
+                };
+                break;
+                case '中雪':
+                imageUrl = '1中雪.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: 'white',
+                    hoverBorderGlow: '0 0 5px 5px white'
+                };
+                break;
+                case '大雪':
+                imageUrl = '1大雪.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: 'white',
+                    hoverBorderGlow: '0 0 5px 5px white'
+                };
+                break;
+                case '暴雪':
+                imageUrl = '1暴雪.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: 'white',
+                    hoverBorderGlow: '0 0 5px 5px white'
+                };
+                break;
+                case '浮尘':
+                imageUrl = '1浮尘.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: 'white',
+                    hoverBorderGlow: '0 0 5px 5px white'
+                };
+                break;
+                case '扬沙':
+                imageUrl = '1扬沙.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: 'white',
+                    hoverBorderGlow: '0 0 5px 5px white'
+                };
+                break;
+               case '沙尘暴':
+                imageUrl = '1沙尘暴.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: 'white',
+                    hoverBorderGlow: '0 0 5px 5px white'
+                };
+                break;
+                case '强沙尘暴':
+                imageUrl = '1强沙尘暴.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: 'white',
+                    hoverBorderGlow: '0 0 5px 5px white'
+                };
+                break;
+                case '雾':
+                imageUrl = '1雾.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: 'white',
+                    hoverBorderGlow: '0 0 5px 5px white'
+                };
+                break;
+                case '霾':
+                imageUrl = '1霾.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: 'white',
+                    hoverBorderGlow: '0 0 5px 5px white'
+                };
+                break;
+                case '风':
+                imageUrl = '1风.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: 'white',
+                    hoverBorderGlow: '0 0 5px 5px white'
+                };
+                break;
+                case '大风':
+                imageUrl = '1大风.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: 'white',
+                    hoverBorderGlow: '0 0 5px 5px white'
+                };
+                break;
+                case '飓风':
+                imageUrl = '1飓风.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: 'white',
+                    hoverBorderGlow: '0 0 5px 5px white'
+                };
+                break;
+                case '热带风暴':
+                imageUrl = '1热带风暴.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: 'white',
+                    hoverBorderGlow: '0 0 5px 5px white'
+                };
+                break;
+                case '龙卷风':
+                imageUrl = '1龙卷风.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: 'white',
+                    hoverBorderGlow: '0 0 5px 5px white'
+                };
+                break;
+                case '冷':
+                imageUrl = '1低温.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: 'white',
+                    hoverBorderGlow: '0 0 5px 5px white'
+                };
+                case '热':
+                imageUrl = '1高温.png';
+                buttonStyles = {
+                    width: '63px',
+                    height: '32px',
+                    borderRadius: '4px',
+                    hoverColor: 'white',
+                    hoverBorderGlow: '0 0 5px 5px white'
+                };
+                break;
+                break;
+            default:
+                imageUrl = 'default.png';
+                buttonStyles = {
+                    width: '100px',
+                    height: '50px',
+                    borderRadius: '10px',
+                    hoverColor: 'gray',
+                    hoverBorderGlow: '0 0 5px 5px gray'
+                };
+        }
+
+        // 更新按钮样式
+        weatherButton.style.backgroundImage = `url(${imageUrl})`;
+        weatherButton.style.width = buttonStyles.width;
+        weatherButton.style.height = buttonStyles.height;
+        weatherButton.style.borderRadius = buttonStyles.borderRadius;
+        weatherButton.style.opacity = 0; // 初始透明度为0
+
+        // 清空并更新弹窗内容
+        weatherPopup.innerHTML = `
+            <div class="weather-current">
+                <p><span style="font-size: 20px;">${currentTemp}</span>°C</p>
+                <p>${currentCondition}</p>
+            </div>
+            <div class="weather-forecast">
+                <p>未来三天天气预报：</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>天气状况</th>
+                            <th>最高温度</th>
+                            <th>最低温度</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${dailyForecasts.map((forecast, index) => `
+                            <tr>
+                                <td>${index === 0? '今天' : index === 1? '明天' : '后天'}（${forecast.date}）</td>
+                                <td>${forecast.text_day}</td>
+                                <td>${forecast.high}°C</td>
+                                <td>${forecast.low}°C</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+            <div id="temperature-chart-container">
+                <canvas id="temperature-chart"></canvas>
+            </div>
+            <div class="last-update-time" style="color: white; text-align: center;">
+                更新时间: ${lastUpdateTime}
+            </div>
+            <div class="data-source" style="color: white; text-align: center;">
+                数据来自于心知天气（天气应用版本:1.0）
+            </div>
+        `;
+
+        // 添加滚动条
+        weatherPopup.style.overflowY = 'overlay'; // 使用 overlay 避免滚动条影响布局
+
+        // 图片加载完成后，设置透明度为1
+        const img = new Image();
+        img.src = imageUrl;
+        img.onload = function () {
+            // 渐渐显示按钮
+            weatherButton.style.transition = 'opacity 0.5s ease';
+            weatherButton.style.opacity = 1;
+        };
+
+        // 动画效果：鼠标悬停时显示弹窗
+        weatherButton.addEventListener('mouseover', function () {
+            weatherButton.style.backgroundColor = buttonStyles.hoverColor;
+            weatherButton.style.boxShadow = buttonStyles.hoverBorderGlow;
+            weatherPopup.style.display = 'block';
+            weatherPopup.style.opacity = 0;
+            setTimeout(() => {
+                weatherPopup.style.opacity = 1;
+            }, 10);
+        });
+
+        weatherButton.addEventListener('mouseout', function () {
+            weatherButton.style.backgroundColor = '';
+            weatherButton.style.boxShadow = '';
+            // 不直接隐藏弹窗，等待鼠标移出弹窗
+        });
+
+        weatherPopup.addEventListener('mouseover', function () {
+            weatherPopup.style.opacity = 1;
+            // 清除可能存在的隐藏定时器
+            clearTimeout(weatherPopup.hideTimeout);
+        });
+
+        weatherPopup.addEventListener('mouseout', function () {
+            // 设置一个延迟隐藏的定时器
+            weatherPopup.hideTimeout = setTimeout(() => {
+                weatherPopup.style.opacity = 0;
+                setTimeout(() => {
+                    weatherPopup.style.display = 'none';
+                }, 500);
+            }, 500);
+        });
+
+        // 绘制温度折线图
+        const temperatureChartCanvas = document.getElementById('temperature-chart');
+        if (temperatureChartCanvas) {
+            // 创建图表的代码
+        } else {
+            console.error('未找到 temperature-chart 元素');
+        }
+        const labels = dailyForecasts.map((forecast, index) => index === 0? '今天' : index === 1? '明天' : '后天');
+        const highTemperatures = dailyForecasts.map(forecast => parseInt(forecast.high));
+        const lowTemperatures = dailyForecasts.map(forecast => parseInt(forecast.low));
+
+        // 打印变量以进行调试
+        console.log('highTemperatures:', highTemperatures);
+        console.log('lowTemperatures:', lowTemperatures);
+
+        if (temperatureChart) {
+            temperatureChart.destroy();
+        }
+
+        temperatureChart = new Chart(temperatureChartCanvas, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: '最高温度',
+                        data: highTemperatures,
+                        borderColor: 'rgb(255, 99, 132)',
+                        backgroundColor: 'rgba(255, 0, 0, 1)',
+                        fill: false
+                    },
+                    {
+                        label: '最低温度',
+                        data: lowTemperatures,
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        title: {
+                            display: true,
+                            text: '温度 (°C)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: '日期'
+                        }
+                    }
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error('获取天气信息时出错:', error);
+        weatherPopup.innerHTML = '<p>获取天气信息失败，请稍后重试。</p>';
+    }
+}
+
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            fetchWeather(latitude, longitude);
+        }, function (error) {
+            console.error('获取地理位置时出错:', error);
+            weatherPopup.innerHTML = '<p>无法获取您的地理位置，请检查权限设置。</p>';
+        });
+    } else {
+        console.error('浏览器不支持定位');
+        weatherPopup.innerHTML = '<p>您的浏览器不支持地理位置功能，请更换浏览器。</p>';
+    }
+}
+
+window.onload = function () {
+    getLocation();
+};
+    
+</script>
+
+
+
+</body>
+</html>
